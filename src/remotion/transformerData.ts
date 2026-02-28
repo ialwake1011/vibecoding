@@ -76,3 +76,62 @@ export const generateAttentionData = (tokens: TokenNode[]): AttentionData => {
 
     return { tokens, weights };
 };
+
+export type VocabLogit = {
+    id: string;
+    word: string;
+    probability: number; // 0.0 ~ 1.0 (Softmax)
+    isTarget: boolean; // 최종 선택된 단어인지 여부
+};
+
+export type LogitData = {
+    vocabSize: number;
+    predictions: VocabLogit[];
+};
+
+export const generateLogitData = (): LogitData => {
+    // 테마에 맞는 후보 단어들
+    const words = [
+        "위로", "기억", "슬픔", "함께", "영원", "평안", "마음", "눈물", "안식", "시간",
+        "별", "아픔", "바람", "빛", "어둠", "소리", "침묵", "운명", "그리움", "내일",
+        "축하", "파티", "기쁨", "환희", "행운", "빨리", "잊혀질", "끝", "시작", "안녕"
+    ];
+
+    const vocabSize = 100; // 시각적 웅장함을 위해 더미 단어(빈 큐브)를 포함한 총 보카 사이즈
+    const predictions: VocabLogit[] = [];
+
+    // 목표 단어 (문맥상 맞게 예측된 가장 높은 확률을 가진 단어)
+    const targetWord = "위로";
+
+    for (let i = 0; i < vocabSize; i++) {
+        let prob = Math.random() * 0.1; // 기본적으로 매우 낮은 잡음 확률
+        let word = "";
+        let isTarget = false;
+
+        // 의미 있는 단어들 매핑 (앞쪽 인덱스에 배치)
+        if (i < words.length) {
+            word = words[i];
+            // 긍정적/부정적 맥락에 따른 확률 조작
+            if (["축하", "파티", "기쁨", "행운", "빨리"].includes(word)) {
+                prob = 0.01; // 문맥에 맞지 않아 확률 매우 낮음
+            } else if (["기억", "슬픔", "마음", "그리움"].includes(word)) {
+                prob = 0.3 + (Math.random() * 0.4); // 꽤 높은 후보군
+            }
+        }
+
+        if (word === targetWord) {
+            prob = 0.95; // 정답 예측! (가장 높은 막대)
+            isTarget = true;
+        }
+
+        predictions.push({
+            id: `vocab-${i}`,
+            word,
+            probability: prob,
+            isTarget
+        });
+    }
+
+    // 그리드의 멋진 지형을 위해 랜덤으로 셔플하되, Target 단어는 중앙쯤 배치되도록 약간 조정 가능
+    return { vocabSize, predictions };
+};
