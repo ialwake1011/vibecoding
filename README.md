@@ -66,3 +66,27 @@ src/
     *   일반 모듈/함수 파일: `camelCase.ts`
     *   스타일 파일: `[name].module.css` (또는 로직에 따른 네이밍)
 3.  **Barrel Export**: 각 기능의 최상위에 `index.ts` 를 두어 외부에 공개할 API(컴포넌트, 훅, 타입 등)만을 노출시키는 캡슐화 패턴을 지향합니다.
+
+---
+
+## 🎬 Remotion Commands
+
+**Install Dependencies**
+```console
+npm i
+```
+
+**Start Next.js App**
+```console
+npm run dev
+```
+
+**Start Remotion Studio (Preview)**
+```console
+npm run video
+```
+
+**Render Video to MP4/WebM**
+```console
+npm run render
+```
