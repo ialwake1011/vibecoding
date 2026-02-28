@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { AbsoluteFill } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
-import { generateEmbeddingData } from './transformerData';
+import { generateEmbeddingData, generateAttentionData } from './transformerData';
 import { EmbeddingMatrix } from './EmbeddingMatrix';
+import { AttentionHeatmap } from './AttentionHeatmap';
 
 export const MainComposition: React.FC = () => {
     // 사용자가 입력한 예시 문장 데이터 (슬픔, 기억, 위로 등의 문맥 포함)
@@ -12,6 +13,7 @@ export const MainComposition: React.FC = () => {
     const embeddingDim = 64;
 
     const data = useMemo(() => generateEmbeddingData(inputSentence, embeddingDim), [inputSentence, embeddingDim]);
+    const attentionData = useMemo(() => generateAttentionData(data.tokens), [data.tokens]);
 
     return (
         <AbsoluteFill className="bg-[#050505]"> {/* 다크 모드 배경색 */}
@@ -26,8 +28,15 @@ export const MainComposition: React.FC = () => {
                 <pointLight position={[-20, -20, -20]} intensity={0.8} color="#2563eb" />
                 <directionalLight position={[0, 0, 10]} intensity={0.5} />
 
-                {/* 트랜스포머 임베딩 매트릭스 시각화 컴포넌트 */}
-                <EmbeddingMatrix data={data} />
+                {/* 트랜스포머 임베딩 매트릭스 시각화 컴포넌트 (좌측) */}
+                <group position={[-20, 0, 0]}>
+                    <EmbeddingMatrix data={data} />
+                </group>
+
+                {/* 트랜스포머 어텐션 히트맵 시각화 컴포넌트 (우측) */}
+                <group position={[15, 0, 0]}>
+                    <AttentionHeatmap data={attentionData} />
+                </group>
             </ThreeCanvas>
         </AbsoluteFill>
     );

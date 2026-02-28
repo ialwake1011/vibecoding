@@ -45,3 +45,34 @@ export const generateEmbeddingData = (
         matrixValues,
     };
 };
+
+export type AttentionData = {
+    tokens: TokenNode[];
+    weights: Float32Array; // Token x Token 2D 배열을 1D로 평탄화 (0.0 ~ 1.0)
+};
+
+// 가상의 셀프 어텐션 가중치 데이터 생성 (토큰 간 관계도)
+export const generateAttentionData = (tokens: TokenNode[]): AttentionData => {
+    const n = tokens.length;
+    const weights = new Float32Array(n * n);
+
+    for (let r = 0; r < n; r++) {
+        let rowSum = 0;
+        // 임의의 가중치 부여
+        for (let c = 0; c < n; c++) {
+            // 대각선(자기 자신)이나, 특정 연관 단어에 높은 가중치 부여를 흉내냄
+            let w = Math.random();
+            if (r === c) w += 1.0; // 자기 자신
+
+            const val = Math.max(0, w);
+            weights[r * n + c] = val;
+            rowSum += val;
+        }
+        // Softmax 흉내내기 (행의 합을 1로 만들기)
+        for (let c = 0; c < n; c++) {
+            weights[r * n + c] /= rowSum;
+        }
+    }
+
+    return { tokens, weights };
+};
